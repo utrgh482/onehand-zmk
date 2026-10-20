@@ -1,0 +1,6 @@
+if SHIELD_ONEHAND
+
+config ZMK_KEYBOARD_NAME
+    default "OneHand"
+
+endif

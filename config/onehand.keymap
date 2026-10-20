@@ -1,0 +1,99 @@
+/*
+ * 한손 키보드 1호 — 키 배치
+ *
+ * 층(layer)
+ *   0 BASE : 기본 (영문/한글)
+ *   1 SCD  : 둘째층 — 엄지 열6을 누른 채
+ *   2 NUM  : 숫자층 — 엄지 열4를 누른 채
+ *   3 FN   : 기능층 — 둘째와 숫자를 동시에 누른 채 (F키, 블루투스, 이동키)
+ *
+ * 엄지 (줄4)
+ *   열3 Ctrl         열4 짧게 Enter / 길게 숫자층
+ *   열5 짧게 Space / 길게 Shift      열6 둘째층
+ *
+ * 한/영: 오른쪽 Alt (윈도우 기본 한국어 자판). 안 되면 RALT 대신 LANG1 로 바꾸세요.
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/outputs.h>
+
+#define BASE 0
+#define SCD  1
+#define NUM  2
+#define FN   3
+
+/ {
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+        fn_layer {
+            if-layers = <SCD NUM>;
+            then-layer = <FN>;
+        };
+    };
+
+    behaviors {
+        /* Space 짧게 / Shift 길게. 빠르게 칠 때 Shift로 오인되지 않게 tap-preferred */
+        sft_spc: shift_space {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <200>;
+            quick-tap-ms = <150>;
+            bindings = <&kp>, <&kp>;
+        };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        base_layer {
+            display-name = "Base";
+            bindings = <
+&kp ESC    &kp BSPC   &kp SEMI   &kp CAPS   &kp RALT   &kp C_MUTE
+&kp TAB    &kp Q      &kp W      &kp E      &kp R      &kp T
+&kp LSHFT  &kp H      &kp N      &kp J      &kp K      &kp M
+&kp LALT   &kp A      &kp S      &kp D      &kp F      &kp P
+                                 &kp LCTRL  &lt NUM ENTER  &sft_spc LSHFT SPACE  &mo SCD
+            >;
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
+        };
+
+        scd_layer {
+            display-name = "둘째";
+            bindings = <
+&kp GRAVE  &kp DEL    &kp SQT    &kp LBKT   &kp RBKT   &trans
+&trans     &kp V      &kp C      &kp X      &kp Z      &kp G
+&trans     &kp Y      &kp B      &kp U      &kp I      &kp L
+&trans     &kp COMMA  &kp DOT    &kp FSLH   &kp MINUS  &kp O
+                                 &trans     &trans     &trans     &trans
+            >;
+            sensor-bindings = <&inc_dec_kp C_NEXT C_PREV>;
+        };
+
+        num_layer {
+            display-name = "숫자";
+            bindings = <
+&kp ESC    &kp DEL    &kp EQUAL  &kp LBKT   &kp RBKT   &trans
+&trans     &kp N1     &kp N2     &kp N3     &kp N4     &kp N5
+&trans     &kp N6     &kp N7     &kp N8     &kp N9     &kp N0
+&trans     &kp LEFT   &kp DOWN   &kp UP     &kp RIGHT  &kp BSLH
+                                 &trans     &trans     &trans     &trans
+            >;
+            sensor-bindings = <&inc_dec_kp PG_UP PG_DN>;
+        };
+
+        fn_layer {
+            display-name = "기능";
+            bindings = <
+&bt BT_CLR &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &out OUT_TOG &kp F12
+&studio_unlock &kp F1  &kp F2     &kp F3     &kp F4     &kp F5
+&trans     &kp F6     &kp F7     &kp F8     &kp F9     &kp F10
+&kp LGUI   &kp HOME   &kp PG_DN  &kp PG_UP  &kp END    &kp F11
+                                 &trans     &trans     &trans     &trans
+            >;
+            sensor-bindings = <&inc_dec_kp C_BRI_UP C_BRI_DN>;
+        };
+    };
+};

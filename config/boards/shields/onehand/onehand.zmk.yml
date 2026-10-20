@@ -1,0 +1,10 @@
+file_format: "1"
+id: onehand
+name: OneHand
+type: shield
+url: https://github.com/
+requires: [pro_micro]
+features:
+  - keys
+  - encoder
+  - studio
